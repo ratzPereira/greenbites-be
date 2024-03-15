@@ -6,6 +6,7 @@ import com.ratz.greenbites.entity.Role;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.mapper.UserMapper;
+import com.ratz.greenbites.messaging.QueueService;
 import com.ratz.greenbites.repository.RoleRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.UserService;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder encoder;
+    private final QueueService queueService;
 
     @Override
     public UserDTO createUser(RegisterFormDTO registerFormDTO) {
@@ -60,6 +62,10 @@ public class UserServiceImpl implements UserService {
 
             // Convert and Return the newly created user
             userRepository.save(user);
+
+            //send welcome email
+            queueService.sendEmailRequest(user.getEmail());
+
             return UserMapper.INSTANCE.userToUserDTO(user);
 
 
