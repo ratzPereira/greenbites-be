@@ -66,6 +66,7 @@ public class UserController {
         return sendResponse(UserMapper.INSTANCE.userToUserDTO(user));
     }
 
+
     private URI getURI() {
         return URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user/get/<userId>").toUriString());
     }
