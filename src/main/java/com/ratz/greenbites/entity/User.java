@@ -21,10 +21,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Username cannot be empty")
-    @Column(unique = true)
-    private String username;
-
     @Email(message = "Email is not valid")
     @NotEmpty(message = "Email cannot be empty")
     @Column(unique = true)
@@ -32,7 +28,6 @@ public class User {
 
     @NotEmpty(message = "Password cannot be empty")
     private String password;
-    
 
     private boolean enabled;
     private boolean notLocked;
@@ -49,4 +44,6 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = false)
+    private Profile profile;
 }

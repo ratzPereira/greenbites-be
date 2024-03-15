@@ -2,11 +2,13 @@ package com.ratz.greenbites.services.Impl;
 
 import com.ratz.greenbites.DTO.RegisterFormDTO;
 import com.ratz.greenbites.DTO.UserDTO;
+import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.Role;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.mapper.UserMapper;
 import com.ratz.greenbites.messaging.QueueService;
+import com.ratz.greenbites.repository.ProfileRepository;
 import com.ratz.greenbites.repository.RoleRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.UserService;
@@ -24,20 +26,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ProfileRepository profileRepository;
     private final BCryptPasswordEncoder encoder;
     private final QueueService queueService;
 
     @Override
     public UserDTO createUser(RegisterFormDTO registerFormDTO) {
-        log.info("Attempting to register a new user with username: {}", registerFormDTO.getUsername());
+        log.info("Attempting to register a new user with email: {}", registerFormDTO.getEmail());
         // Check the email is unique
         if (userRepository.existsByEmail(registerFormDTO.getEmail())) {
             throw new ApiException("Email already exists");
-        }
-
-        // Check the username is unique
-        if (userRepository.existsByUsername(registerFormDTO.getUsername())) {
-            throw new ApiException("Username already exists");
         }
 
         //save user
@@ -50,7 +48,6 @@ public class UserServiceImpl implements UserService {
 
             user.getRoles().add(userRole);
             user.setEmail(registerFormDTO.getEmail());
-            user.setUsername(registerFormDTO.getUsername());
 
             // Encode password
             user.setPassword(encoder.encode(registerFormDTO.getPassword()));
@@ -60,14 +57,24 @@ public class UserServiceImpl implements UserService {
             user.setEnabled(true);
             user.setNotLocked(true);
 
-            // Convert and Return the newly created user
+            //create empty profile
+            Profile profile = new Profile();
+            profile.setFirstName(registerFormDTO.getFirstName());
+            profile.setLastName(registerFormDTO.getLastName());
+            user.setProfile(profile);
+
+            //save user
             userRepository.save(user);
+
+            //save profile
+            profile.setUser(user);
+            profileRepository.save(profile);
 
             //send welcome email
             queueService.sendEmailRequest(user.getEmail());
 
+            // Convert and Return the newly created user
             return UserMapper.INSTANCE.userToUserDTO(user);
-
 
             // If errors, throw exception with proper message
         } catch (Exception e) {

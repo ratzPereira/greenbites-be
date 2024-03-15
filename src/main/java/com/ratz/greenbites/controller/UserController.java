@@ -80,7 +80,7 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(HttpResponse.builder()
                         .timeStamp(now().toString())
-                        .data(Map.of("player", userDTO,
+                        .data(Map.of("user", userDTO,
                                 "access_token", tokenProvider.createAccessToken(getUserPrincipal(userDTO)),
                                 "refresh_token", tokenProvider.createRefreshToken(getUserPrincipal(userDTO))))
                         .message("User logged in")

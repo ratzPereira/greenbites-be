@@ -14,6 +14,9 @@ public class RegisterFormDTO {
     @NotEmpty(message = "Password cannot be empty")
     private String password;
 
-    @NotEmpty(message = "Username cannot be empty")
-    private String username;
+    @NotEmpty(message = "First name cannot be empty")
+    private String firstName;
+
+    @NotEmpty(message = "Last name cannot be empty")
+    private String lastName;
 }
