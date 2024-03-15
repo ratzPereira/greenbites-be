@@ -9,4 +9,6 @@ public interface UserService {
     UserDTO createUser(RegisterFormDTO registerFormDTO);
 
     User getUserByEmail(String email);
+
+    User getUserById(Long id);
 }
