@@ -68,4 +68,10 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Error creating user");
         }
     }
+
+    @Override
+    public User getUserByEmail(String email) {
+        log.info("Fetching user by email: {}", email);
+        return userRepository.findByEmail(email);
+    }
 }
