@@ -1,6 +1,7 @@
 package com.ratz.greenbites.controller;
 
 import com.ratz.greenbites.DTO.ProfileDTO;
+import com.ratz.greenbites.DTO.ProfileUpdateDTO;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.ProfileResponseMapper;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,6 +45,18 @@ public class ProfileController {
         Profile profile = profileService.getProfileByUserId(user.getId());
         return buildProfileResponse(user, profile);
     }
+
+    @PutMapping
+    public ResponseEntity<ProfileDTO> updateProfile(@RequestBody ProfileUpdateDTO profileDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        User user = userService.getUserByEmail(currentUsername);
+        Profile profile = profileService.updateProfile(profileDTO, user);
+
+        return buildProfileResponse(user, profile);
+    }
+
 
     private ResponseEntity<ProfileDTO> buildProfileResponse(User user, Profile profile) {
 

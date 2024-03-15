@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
+
 
 @Data
 public class ProfileUpdateDTO {
@@ -16,6 +16,5 @@ public class ProfileUpdateDTO {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
-    private List<String> photos;
-    private String profileImageUrl;
+
 }

@@ -1,8 +1,9 @@
 package com.ratz.greenbites.services.Impl;
 
-import com.ratz.greenbites.DTO.ProfileDTO;
+import com.ratz.greenbites.DTO.ProfileUpdateDTO;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
+import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.repository.ProfileRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.ProfileService;
@@ -26,12 +27,22 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile createProfile(ProfileDTO profileDTO, User user) {
-        return null;
-    }
+    public Profile updateProfile(ProfileUpdateDTO profileDTO, User user) {
 
-    @Override
-    public Profile updateProfile(ProfileDTO profileDTO, User user) {
-        return null;
+        log.info("Updating profile for user ID: {}", user.getId());
+
+        Profile profile = profileRepository.getProfileByUserId(user.getId());
+
+        if (profile == null) {
+            throw new ApiException("Profile not found for user with id: " + user.getId());
+        }
+
+        profile.setFirstName(profileDTO.getFirstName());
+        profile.setLastName(profileDTO.getLastName());
+        profile.setBio(profileDTO.getBio());
+        profile.setBirthDate(profileDTO.getBirthDate());
+        profile.setLocation(profileDTO.getLocation());
+
+        return profileRepository.save(profile);
     }
 }
