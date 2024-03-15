@@ -7,6 +7,7 @@ import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.repository.ProfileRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.ProfileService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    @Transactional
     public Profile updateProfile(ProfileUpdateDTO profileDTO, User user) {
 
         log.info("Updating profile for user ID: {}", user.getId());

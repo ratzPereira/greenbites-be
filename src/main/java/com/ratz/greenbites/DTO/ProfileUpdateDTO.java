@@ -16,5 +16,4 @@ public class ProfileUpdateDTO {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
-
 }
