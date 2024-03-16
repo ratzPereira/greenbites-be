@@ -1,6 +1,8 @@
 package com.ratz.greenbites.controller;
 
 import com.ratz.greenbites.DTO.ProfileDTO;
+import com.ratz.greenbites.DTO.ProfilePhotosDTO;
+import com.ratz.greenbites.DTO.ProfilePictureDTO;
 import com.ratz.greenbites.DTO.ProfileUpdateDTO;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
@@ -52,7 +54,31 @@ public class ProfileController {
         String currentUsername = authentication.getName();
 
         User user = userService.getUserByEmail(currentUsername);
-        Profile profile = profileService.updateProfile(profileDTO, user);
+        Profile profile = profileService.updateProfile(profileDTO, user.getId());
+
+        return buildProfileResponse(user, profile);
+    }
+
+    @PutMapping("/photo")
+    public ResponseEntity<ProfileDTO> updateProfilePicture(@RequestBody ProfilePictureDTO dto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        User user = userService.getUserByEmail(currentUsername);
+
+        Profile profile = profileService.updateProfilePicture(dto.getProfilePictureUrl(), user.getId());
+
+        return buildProfileResponse(user, profile);
+    }
+
+    @PostMapping("/photos")
+    public ResponseEntity<ProfileDTO> addPhotos(@RequestBody ProfilePhotosDTO dto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        User user = userService.getUserByEmail(currentUsername);
+
+        Profile profile = profileService.addPhotosToProfile(dto.getPhotoUrls(), user.getId());
 
         return buildProfileResponse(user, profile);
     }
