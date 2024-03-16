@@ -1,9 +1,6 @@
 package com.ratz.greenbites.controller;
 
-import com.ratz.greenbites.DTO.ProfileDTO;
-import com.ratz.greenbites.DTO.ProfilePhotosDTO;
-import com.ratz.greenbites.DTO.ProfilePictureDTO;
-import com.ratz.greenbites.DTO.ProfileUpdateDTO;
+import com.ratz.greenbites.DTO.*;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.ProfileResponseMapper;
@@ -81,6 +78,18 @@ public class ProfileController {
         Profile profile = profileService.addPhotosToProfile(dto.getPhotoUrls(), user.getId());
 
         return buildProfileResponse(user, profile);
+    }
+
+    @DeleteMapping("/photos")
+    public ResponseEntity<?> removePhotos(@RequestBody RemovePhotosDTO dto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        User user = userService.getUserByEmail(currentUsername);
+
+        profileService.removePhotos(user.getId(), dto);
+
+        return ResponseEntity.ok().build();
     }
 
 

@@ -1,10 +1,10 @@
 package com.ratz.greenbites.services.Impl;
 
 import com.ratz.greenbites.DTO.ProfileUpdateDTO;
+import com.ratz.greenbites.DTO.RemovePhotosDTO;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.repository.ProfileRepository;
-import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.ProfileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
-
-    private final UserRepository userRepository;
+    
     private final ProfileRepository profileRepository;
 
     @Override
@@ -69,6 +68,25 @@ public class ProfileServiceImpl implements ProfileService {
                 .orElseThrow(() -> new ApiException("Profile not found for user" + userId));
 
         profile.getPhotos().addAll(photoUrl);
+
+        return profileRepository.save(profile);
+    }
+
+    @Override
+    @Transactional
+    public Profile removePhotos(Long userId, RemovePhotosDTO dto) {
+        log.info("Removing photos from profile for user ID: {}", userId);
+
+        Profile profile = profileRepository.getProfileByUserId(userId)
+                .orElseThrow(() -> new ApiException("Profile not found for user" + userId));
+
+        if (dto.getProfilePictureUrl() != null && dto.getProfilePictureUrl().equals(profile.getProfileImageUrl())) {
+            profile.setProfileImageUrl(null);
+        }
+
+        if (dto.getPhotoUrls() != null && !dto.getPhotoUrls().isEmpty()) {
+            profile.getPhotos().removeAll(dto.getPhotoUrls());
+        }
 
         return profileRepository.save(profile);
     }
