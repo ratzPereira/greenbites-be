@@ -57,4 +57,19 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.save(existingPost);
     }
+
+    @Override
+    public void deletePost(Long postId, Long userId) {
+
+        log.info("Deleting post with ID: {}", postId);
+
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+
+        if (!existingPost.getUser().getId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to delete this post");
+        }
+
+        postRepository.deleteById(postId);
+    }
 }
