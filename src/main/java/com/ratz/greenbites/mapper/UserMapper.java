@@ -1,6 +1,6 @@
 package com.ratz.greenbites.mapper;
 
-import com.ratz.greenbites.DTO.UserDTO;
+import com.ratz.greenbites.DTO.auth.UserDTO;
 import com.ratz.greenbites.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

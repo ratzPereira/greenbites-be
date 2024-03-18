@@ -1,6 +1,6 @@
 package com.ratz.greenbites.mapper;
 
-import com.ratz.greenbites.DTO.ProfileDTO;
+import com.ratz.greenbites.DTO.profile.ProfileDTO;
 import com.ratz.greenbites.entity.Profile;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -1,6 +1,6 @@
 package com.ratz.greenbites.services.Impl;
 
-import com.ratz.greenbites.DTO.CreatePostDTO;
+import com.ratz.greenbites.DTO.post.CreatePostDTO;
 import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.repository.PostRepository;
@@ -89,5 +89,28 @@ public class PostServiceImpl implements PostService {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         return postRepository.findByUserId(userId, pageable);
+    }
+
+    @Override
+    @Transactional
+    public boolean likeOrDislikePost(Long postId, Long userId) {
+
+        log.info("Like or dislike post with ID: {}", postId);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+
+        if (post.getLikedBy().contains(user)) {
+            post.getLikedBy().remove(user);
+            return false;
+
+        } else {
+            post.getLikedBy().add(user);
+        }
+        postRepository.save(post);
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 package com.ratz.greenbites.services;
 
-import com.ratz.greenbites.DTO.ProfileUpdateDTO;
-import com.ratz.greenbites.DTO.RemovePhotosDTO;
+import com.ratz.greenbites.DTO.profile.ProfileUpdateDTO;
+import com.ratz.greenbites.DTO.profile.RemovePhotosDTO;
 import com.ratz.greenbites.entity.Profile;
 
 import java.util.List;

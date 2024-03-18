@@ -1,6 +1,6 @@
 package com.ratz.greenbites.mapper;
 
-import com.ratz.greenbites.DTO.ProfileDTO;
+import com.ratz.greenbites.DTO.profile.ProfileDTO;
 import com.ratz.greenbites.entity.Profile;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-03-15T13:23:57-0100",
+    date = "2024-03-18T19:08:10-0100",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 18.0.2 (Amazon.com Inc.)"
 )
 @Component

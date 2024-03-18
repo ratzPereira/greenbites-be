@@ -1,13 +1,15 @@
 package com.ratz.greenbites.mapper;
 
-import com.ratz.greenbites.DTO.PostResponseDTO;
+import com.ratz.greenbites.DTO.post.PostResponseDTO;
 import com.ratz.greenbites.entity.Post;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-03-18T11:42:45-0100",
+    date = "2024-03-18T19:08:10-0100",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 18.0.2 (Amazon.com Inc.)"
 )
 @Component
@@ -23,6 +25,10 @@ public class PostMapperImpl implements PostMapper {
 
         postResponseDTO.setId( post.getId() );
         postResponseDTO.setContent( post.getContent() );
+        List<String> list = post.getImageUrls();
+        if ( list != null ) {
+            postResponseDTO.setImageUrls( new ArrayList<String>( list ) );
+        }
         postResponseDTO.setCreatedAt( post.getCreatedAt() );
 
         return postResponseDTO;
@@ -37,6 +43,10 @@ public class PostMapperImpl implements PostMapper {
         Post post = new Post();
 
         post.setId( postDTO.getId() );
+        List<String> list = postDTO.getImageUrls();
+        if ( list != null ) {
+            post.setImageUrls( new ArrayList<String>( list ) );
+        }
         post.setContent( postDTO.getContent() );
         post.setCreatedAt( postDTO.getCreatedAt() );
 

@@ -1,14 +1,10 @@
-package com.ratz.greenbites.DTO;
+package com.ratz.greenbites.DTO.comment;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class CreatePostDTO {
-
-    private List<String> imageUrls;
+public class CreateCommentDTO {
 
     @NotEmpty(message = "Content cannot be empty")
     private String content;

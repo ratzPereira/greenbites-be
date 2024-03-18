@@ -1,6 +1,6 @@
 package com.ratz.greenbites.mapper;
 
-import com.ratz.greenbites.DTO.PostResponseDTO;
+import com.ratz.greenbites.DTO.post.PostResponseDTO;
 import com.ratz.greenbites.entity.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

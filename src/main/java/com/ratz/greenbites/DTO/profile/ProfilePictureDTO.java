@@ -1,4 +1,4 @@
-package com.ratz.greenbites.DTO;
+package com.ratz.greenbites.DTO.profile;
 
 import lombok.Data;
 

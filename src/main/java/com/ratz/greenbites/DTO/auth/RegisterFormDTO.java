@@ -1,4 +1,4 @@
-package com.ratz.greenbites.DTO;
+package com.ratz.greenbites.DTO.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

@@ -1,7 +1,7 @@
 package com.ratz.greenbites.services;
 
-import com.ratz.greenbites.DTO.RegisterFormDTO;
-import com.ratz.greenbites.DTO.UserDTO;
+import com.ratz.greenbites.DTO.auth.RegisterFormDTO;
+import com.ratz.greenbites.DTO.auth.UserDTO;
 import com.ratz.greenbites.entity.User;
 
 public interface UserService {

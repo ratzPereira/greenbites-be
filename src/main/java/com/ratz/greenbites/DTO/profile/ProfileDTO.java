@@ -1,4 +1,4 @@
-package com.ratz.greenbites.DTO;
+package com.ratz.greenbites.DTO.profile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;

@@ -1,6 +1,6 @@
 package com.ratz.greenbites.controller;
 
-import com.ratz.greenbites.DTO.*;
+import com.ratz.greenbites.DTO.profile.*;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.ProfileResponseMapper;

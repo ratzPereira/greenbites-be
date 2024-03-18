@@ -1,7 +1,7 @@
 package com.ratz.greenbites.controller;
 
-import com.ratz.greenbites.DTO.CreatePostDTO;
-import com.ratz.greenbites.DTO.PostResponseDTO;
+import com.ratz.greenbites.DTO.post.CreatePostDTO;
+import com.ratz.greenbites.DTO.post.PostResponseDTO;
 import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.PostMapper;
@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ratz.greenbites.utils.AppConstants.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -45,10 +47,10 @@ public class PostController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PostResponseDTO>> getPostByUserId(
             @PathVariable Long userId,
-            @RequestParam(defaultValue = "0", value = "pageNumber", required = false) int pageNumber,
-            @RequestParam(defaultValue = "10", value = "pageSize", required = false) int pageSize,
-            @RequestParam(defaultValue = "createdAt", value = "sortBy", required = false) String sortBy,
-            @RequestParam(defaultValue = "desc", value = "sortDir", required = false) String sortDir
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, value = "pageNumber", required = false) int pageNumber,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, value = "pageSize", required = false) int pageSize,
+            @RequestParam(defaultValue = DEFAULT_SORT_BY, value = "sortBy", required = false) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIRECTION, value = "sortDir", required = false) String sortDir
     ) {
 
         Page<Post> posts = postService.getPostByUserId(userId, pageNumber, pageSize, sortBy, sortDir);
@@ -74,6 +76,18 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body("Post deleted successfully");
     }
 
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<String> likePost(@PathVariable Long postId) {
+
+        User user = getAuthenticatedUser();
+        boolean liked = postService.likeOrDislikePost(postId, user.getId());
+
+        String message = liked ? "Post liked successfully" : "Like removed successfully";
+        return ResponseEntity.ok().body(message);
+    }
+
+
+    //helper methods
     private PostResponseDTO convertToDto(Post post) {
         User user = userService.getUserById(post.getUser().getId());
         return buildPostResponse(user, post);

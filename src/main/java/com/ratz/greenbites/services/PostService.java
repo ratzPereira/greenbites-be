@@ -1,6 +1,6 @@
 package com.ratz.greenbites.services;
 
-import com.ratz.greenbites.DTO.CreatePostDTO;
+import com.ratz.greenbites.DTO.post.CreatePostDTO;
 import com.ratz.greenbites.entity.Post;
 import org.springframework.data.domain.Page;
 
@@ -15,4 +15,6 @@ public interface PostService {
     Post getPostById(Long postId);
 
     Page<Post> getPostByUserId(Long userId, int pageNumber, int pageSize, String sortBy, String sortDir);
+
+    boolean likeOrDislikePost(Long postId, Long userId);
 }

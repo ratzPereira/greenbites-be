@@ -1,8 +1,8 @@
 package com.ratz.greenbites.controller;
 
-import com.ratz.greenbites.DTO.LoginFormDTO;
-import com.ratz.greenbites.DTO.RegisterFormDTO;
-import com.ratz.greenbites.DTO.UserDTO;
+import com.ratz.greenbites.DTO.auth.LoginFormDTO;
+import com.ratz.greenbites.DTO.auth.RegisterFormDTO;
+import com.ratz.greenbites.DTO.auth.UserDTO;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.entity.UserPrincipal;
 import com.ratz.greenbites.mapper.UserMapper;
