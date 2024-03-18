@@ -49,6 +49,7 @@ public class PostController {
         postResponseDTO.setFirstName(user.getProfile().getFirstName());
         postResponseDTO.setLastName(user.getProfile().getLastName());
         postResponseDTO.setCommentCount(post.getComments().size());
+        postResponseDTO.setImageUrls(post.getImageUrls());
         postResponseDTO.setLikeCount(post.getLikedBy().size());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDTO);

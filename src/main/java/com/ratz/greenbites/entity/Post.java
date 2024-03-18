@@ -24,6 +24,9 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ElementCollection
+    private List<String> imageUrls = new ArrayList<>();
+
     private String content;
     private LocalDateTime createdAt;
 

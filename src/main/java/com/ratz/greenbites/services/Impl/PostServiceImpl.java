@@ -31,6 +31,7 @@ public class PostServiceImpl implements PostService {
 
         Post newPost = new Post();
         newPost.setContent(post.getContent());
+        newPost.setImageUrls(post.getImageUrls());
         newPost.setUser(user);
         newPost.setCreatedAt(LocalDateTime.now());
 
