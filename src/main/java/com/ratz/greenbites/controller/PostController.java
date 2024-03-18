@@ -10,6 +10,7 @@ import com.ratz.greenbites.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,8 +32,6 @@ public class PostController {
         User user = getAuthenticatedUser();
         Post post = postService.createPost(createPostDTO, user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(buildPostResponse(user, post));
-
-
     }
 
     @GetMapping("/{postId}")
@@ -41,6 +40,22 @@ public class PostController {
         User user = getAuthenticatedUser();
         Post post = postService.getPostById(postId);
         return ResponseEntity.ok(buildPostResponse(user, post));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<PostResponseDTO>> getPostByUserId(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0", value = "pageNumber", required = false) int pageNumber,
+            @RequestParam(defaultValue = "10", value = "pageSize", required = false) int pageSize,
+            @RequestParam(defaultValue = "createdAt", value = "sortBy", required = false) String sortBy,
+            @RequestParam(defaultValue = "desc", value = "sortDir", required = false) String sortDir
+    ) {
+
+        Page<Post> posts = postService.getPostByUserId(userId, pageNumber, pageSize, sortBy, sortDir);
+
+        Page<PostResponseDTO> pagePostDTOs = posts.map(this::convertToDto);
+
+        return ResponseEntity.ok(pagePostDTOs);
     }
 
     @PutMapping("/{postId}")
@@ -57,6 +72,11 @@ public class PostController {
         User user = getAuthenticatedUser();
         postService.deletePost(postId, user.getId());
         return ResponseEntity.status(HttpStatus.OK).body("Post deleted successfully");
+    }
+
+    private PostResponseDTO convertToDto(Post post) {
+        User user = userService.getUserById(post.getUser().getId());
+        return buildPostResponse(user, post);
     }
 
 

@@ -2,6 +2,7 @@ package com.ratz.greenbites.services;
 
 import com.ratz.greenbites.DTO.CreatePostDTO;
 import com.ratz.greenbites.entity.Post;
+import org.springframework.data.domain.Page;
 
 public interface PostService {
 
@@ -12,4 +13,6 @@ public interface PostService {
     void deletePost(Long postId, Long userId);
 
     Post getPostById(Long postId);
+
+    Page<Post> getPostByUserId(Long userId, int pageNumber, int pageSize, String sortBy, String sortDir);
 }
