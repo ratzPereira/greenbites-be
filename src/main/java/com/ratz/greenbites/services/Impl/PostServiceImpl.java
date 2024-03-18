@@ -6,6 +6,7 @@ import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.PostService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,5 +37,24 @@ public class PostServiceImpl implements PostService {
         newPost.setCreatedAt(LocalDateTime.now());
 
         return postRepository.save(newPost);
+    }
+
+    @Override
+    @Transactional
+    public Post updatePost(Long postId, CreatePostDTO post, Long userId) {
+
+        log.info("Updating post with ID: {}", postId);
+
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+
+        if (!existingPost.getUser().getId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to update this post");
+        }
+
+        existingPost.setContent(post.getContent());
+        existingPost.setImageUrls(post.getImageUrls());
+
+        return postRepository.save(existingPost);
     }
 }

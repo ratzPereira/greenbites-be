@@ -6,4 +6,6 @@ import com.ratz.greenbites.entity.Post;
 public interface PostService {
 
     Post createPost(CreatePostDTO post, Long userId);
+
+    Post updatePost(Long postId, CreatePostDTO post, Long userId);
 }
