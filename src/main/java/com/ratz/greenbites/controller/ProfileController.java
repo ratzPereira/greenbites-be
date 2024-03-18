@@ -24,10 +24,9 @@ public class ProfileController {
 
     @GetMapping
     public ResponseEntity<ProfileDTO> getCurrentUserProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
 
-        User user = userService.getUserByEmail(currentUsername);
+        User user = getAuthenticatedUser();
+
         Profile profile = profileService.getProfileByUserId(user.getId());
 
         return buildProfileResponse(user, profile);
@@ -47,10 +46,9 @@ public class ProfileController {
 
     @PutMapping
     public ResponseEntity<ProfileDTO> updateProfile(@RequestBody ProfileUpdateDTO profileDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
 
-        User user = userService.getUserByEmail(currentUsername);
+        User user = getAuthenticatedUser();
+
         Profile profile = profileService.updateProfile(profileDTO, user.getId());
 
         return buildProfileResponse(user, profile);
@@ -59,9 +57,7 @@ public class ProfileController {
     @PutMapping("/photo")
     public ResponseEntity<ProfileDTO> updateProfilePicture(@RequestBody ProfilePictureDTO dto) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
+        User user = getAuthenticatedUser();
 
         Profile profile = profileService.updateProfilePicture(dto.getProfilePictureUrl(), user.getId());
 
@@ -71,9 +67,7 @@ public class ProfileController {
     @PostMapping("/photos")
     public ResponseEntity<ProfileDTO> addPhotos(@RequestBody ProfilePhotosDTO dto) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
+        User user = getAuthenticatedUser();
 
         Profile profile = profileService.addPhotosToProfile(dto.getPhotoUrls(), user.getId());
 
@@ -83,15 +77,19 @@ public class ProfileController {
     @DeleteMapping("/photos")
     public ResponseEntity<?> removePhotos(@RequestBody RemovePhotosDTO dto) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
+        User user = getAuthenticatedUser();
 
         profileService.removePhotos(user.getId(), dto);
 
         return ResponseEntity.ok().build();
     }
 
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName(); // ou getEmail(), dependendo de como você configurou UserDetails
+        return userService.getUserByEmail(currentUsername);
+    }
 
     private ResponseEntity<ProfileDTO> buildProfileResponse(User user, Profile profile) {
 

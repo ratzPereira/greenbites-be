@@ -28,51 +28,55 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
-
+        User user = getAuthenticatedUser();
         Post post = postService.createPost(createPostDTO, user.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildPostResponse(user, post));
 
-        return buildPostResponse(user, post);
 
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable Long postId) {
+
+        User user = getAuthenticatedUser();
+        Post post = postService.getPostById(postId);
+        return ResponseEntity.ok(buildPostResponse(user, post));
     }
 
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Long postId, @Valid @RequestBody CreatePostDTO createPostDTO) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
-
+        User user = getAuthenticatedUser();
         Post post = postService.updatePost(postId, createPostDTO, user.getId());
-
-        return buildPostResponse(user, post);
+        return ResponseEntity.ok(buildPostResponse(user, post));
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        User user = userService.getUserByEmail(currentUsername);
-
+        User user = getAuthenticatedUser();
         postService.deletePost(postId, user.getId());
-
         return ResponseEntity.status(HttpStatus.OK).body("Post deleted successfully");
     }
 
 
-    private ResponseEntity<PostResponseDTO> buildPostResponse(User user, Post post) {
+    private User getAuthenticatedUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        return userService.getUserByEmail(currentUsername);
+    }
+
+
+    private PostResponseDTO buildPostResponse(User user, Post post) {
 
         PostResponseDTO postResponseDTO = PostMapper.INSTANCE.postToPostDTO(post);
-
         postResponseDTO.setFirstName(user.getProfile().getFirstName());
         postResponseDTO.setLastName(user.getProfile().getLastName());
         postResponseDTO.setCommentCount(post.getComments().size());
         postResponseDTO.setImageUrls(post.getImageUrls());
         postResponseDTO.setLikeCount(post.getLikedBy().size());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDTO);
+        return postResponseDTO;
     }
 }
