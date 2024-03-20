@@ -11,4 +11,5 @@ public class CommentResponseDTO {
     private Long userId;
     private String content;
     private LocalDateTime createdAt;
+    private int likeCount;
 }

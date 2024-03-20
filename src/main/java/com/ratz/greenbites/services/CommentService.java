@@ -2,6 +2,7 @@ package com.ratz.greenbites.services;
 
 import com.ratz.greenbites.DTO.comment.CreateCommentDTO;
 import com.ratz.greenbites.entity.Comment;
+import org.springframework.data.domain.Page;
 
 public interface CommentService {
 
@@ -12,4 +13,6 @@ public interface CommentService {
     void deleteComment(Long commentId, Long userId);
 
     boolean toggleLike(Long commentId, Long userId);
+
+    Page<Comment> getCommentsByPostId(Long postId, int page, int size);
 }

@@ -10,6 +10,10 @@ import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -91,5 +95,12 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.save(comment);
         return !isLiked;
+    }
+
+    @Override
+    public Page<Comment> getCommentsByPostId(Long postId, int page, int size) {
+        log.info("Fetching comments for post with ID: {}", postId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return commentRepository.findByPostId(postId, pageable);
     }
 }

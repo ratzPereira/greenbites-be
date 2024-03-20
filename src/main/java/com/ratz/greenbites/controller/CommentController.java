@@ -9,6 +9,7 @@ import com.ratz.greenbites.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -61,6 +62,15 @@ public class CommentController {
         return ResponseEntity.ok(liked ? "Comment liked" : "Like removed from comment");
     }
 
+    @GetMapping("/{postId}/comments/")
+    public ResponseEntity<Page<CommentResponseDTO>> getCommentsByPostId(@PathVariable Long postId,
+                                                                        @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<Comment> commentPage = commentService.getCommentsByPostId(postId, page, size);
+        Page<CommentResponseDTO> dtoPage = commentPage.map(this::buildCommentResponse);
+        return ResponseEntity.ok(dtoPage);
+    }
+
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
@@ -74,6 +84,7 @@ public class CommentController {
         dto.setContent(comment.getContent());
         dto.setUserId(comment.getUser().getId());
         dto.setCreatedAt(comment.getCreatedAt());
+        dto.setLikeCount(comment.getLikedBy().size());
 
         return dto;
     }
