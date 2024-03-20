@@ -57,4 +57,39 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.save(comment);
     }
 
+    @Override
+    public void deleteComment(Long commentId, Long userId) {
+        log.info("Deleting comment with ID: {}", commentId);
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
+
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User not authorized to delete this comment");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+    @Override
+    public boolean toggleLike(Long commentId, Long userId) {
+
+        log.info("Toggling like on comment with ID: {}", commentId);
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isLiked = comment.getLikedBy().contains(user);
+
+        if (isLiked) {
+            comment.getLikedBy().remove(user);
+        } else {
+            comment.getLikedBy().add(user);
+        }
+
+        commentRepository.save(comment);
+        return !isLiked;
+    }
 }

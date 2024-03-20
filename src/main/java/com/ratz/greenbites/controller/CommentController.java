@@ -42,6 +42,24 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(buildCommentResponse(comment));
     }
 
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+
+        log.info("Received request to delete comment with id: {}", commentId);
+        User user = getAuthenticatedUser();
+        commentService.deleteComment(commentId, user.getId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/{postId}/comments/{commentId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long commentId) {
+
+        log.info("Received request to like comment with id: {}", commentId);
+        User user = getAuthenticatedUser();
+        boolean liked = commentService.toggleLike(commentId, user.getId());
+
+        return ResponseEntity.ok(liked ? "Comment liked" : "Like removed from comment");
+    }
 
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
