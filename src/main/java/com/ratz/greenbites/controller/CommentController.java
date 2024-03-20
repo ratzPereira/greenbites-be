@@ -30,7 +30,16 @@ public class CommentController {
         log.info("Received request to create comment for post with id: {}", postId);
         User user = getAuthenticatedUser();
         Comment comment = commentService.createComment(createCommentDTO, postId, user.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(buildCommentResponse(user, comment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildCommentResponse(comment));
+    }
+
+    @PutMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<CommentResponseDTO> updateComment(@PathVariable Long commentId, @Valid @RequestBody CreateCommentDTO createCommentDTO) {
+
+        log.info("Received request to update comment with id: {}", commentId);
+        User user = getAuthenticatedUser();
+        Comment comment = commentService.updateComment(createCommentDTO.getContent(), commentId, user.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(buildCommentResponse(comment));
     }
 
 
@@ -40,7 +49,7 @@ public class CommentController {
         return userService.getUserByEmail(currentUsername);
     }
 
-    private CommentResponseDTO buildCommentResponse(User user, Comment comment) {
+    private CommentResponseDTO buildCommentResponse(Comment comment) {
 
         CommentResponseDTO dto = new CommentResponseDTO();
         dto.setId(comment.getId());

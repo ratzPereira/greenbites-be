@@ -41,4 +41,20 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.save(newComment);
     }
 
+    @Override
+    public Comment updateComment(String content, Long commentId, Long userId) {
+        log.info("Updating comment with ID: {}", commentId);
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
+
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User not authorized to update this comment");
+        }
+
+        comment.setContent(content);
+        comment.setCreatedAt(LocalDateTime.now());
+        return commentRepository.save(comment);
+    }
+
 }

@@ -6,4 +6,6 @@ import com.ratz.greenbites.entity.Comment;
 public interface CommentService {
 
     Comment createComment(CreateCommentDTO comment, Long postId, Long userId);
+
+    Comment updateComment(String content, Long commentId, Long userId);
 }
