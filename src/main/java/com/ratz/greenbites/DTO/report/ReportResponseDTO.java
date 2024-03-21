@@ -13,5 +13,6 @@ public class ReportResponseDTO {
     private String status;
     private String reason;
     private LocalDateTime reportedAt;
+    private Long reportedUserId;
 }
 

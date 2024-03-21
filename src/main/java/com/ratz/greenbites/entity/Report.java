@@ -22,6 +22,10 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY)
     private User reporter;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_user_id")
+    private User reportedUser;
+
     private Long referenceId;
 
     @Enumerated(EnumType.STRING)

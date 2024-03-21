@@ -10,4 +10,5 @@ public class ReportDTO {
     private Long referenceId;
     private ReferenceType referenceType;
     private String reason;
+    private Long reportedUserId;
 }

@@ -5,6 +5,7 @@ import com.ratz.greenbites.entity.Report;
 import com.ratz.greenbites.enums.ReferenceType;
 import com.ratz.greenbites.enums.ReportStatus;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -23,5 +24,8 @@ public interface ReportMapper {
         return status.toString();
     }
 
+    @Mapping(source = "reportedUser.id", target = "reportedUserId")
     ReportResponseDTO reportToReportResponseDTO(Report report);
+
+    Report reportResponseDTOToReport(ReportResponseDTO reportResponseDTO);
 }
