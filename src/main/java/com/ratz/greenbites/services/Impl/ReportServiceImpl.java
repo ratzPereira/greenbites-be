@@ -58,4 +58,14 @@ public class ReportServiceImpl implements ReportService {
     public Page<Report> getReportsByReportedUserId(Long reportedUserId, Pageable pageable) {
         return reportRepository.findByReportedUserId(reportedUserId, pageable);
     }
+
+    @Override
+    public Report updateReportStatus(Long reportId, ReportStatus newStatus) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        report.setStatus(newStatus);
+        report.setUpdatedAt(LocalDateTime.now());
+        return reportRepository.save(report);
+    }
 }

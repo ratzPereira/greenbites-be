@@ -2,9 +2,11 @@ package com.ratz.greenbites.controller;
 
 import com.ratz.greenbites.DTO.report.ReportDTO;
 import com.ratz.greenbites.DTO.report.ReportResponseDTO;
+import com.ratz.greenbites.DTO.report.UpdateReportStatusDTO;
 import com.ratz.greenbites.entity.Report;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.enums.ReferenceType;
+import com.ratz.greenbites.enums.ReportStatus;
 import com.ratz.greenbites.mapper.ReportMapper;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.ReportService;
@@ -62,6 +64,14 @@ public class ReportController {
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
         return buildPageReportResponse(reportDTOs, "Reports fetched successfully for reportedUserId: " + reportedUserId);
     }
+
+    @PatchMapping("/{reportId}/status")
+    public ResponseEntity<HttpResponse> updateReportStatus(@PathVariable Long reportId, @RequestBody UpdateReportStatusDTO statusDTO) {
+        Report updatedReport = reportService.updateReportStatus(reportId, statusDTO.getStatus());
+        ReportResponseDTO reportResponseDTO = reportMapper.reportToReportResponseDTO(updatedReport);
+        return buildReportResponse(reportResponseDTO);
+    }
+
 
     @PostMapping
     public ResponseEntity<HttpResponse> createReport(@RequestBody ReportDTO reportDTO) {

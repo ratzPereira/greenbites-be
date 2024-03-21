@@ -20,4 +20,6 @@ public interface ReportService {
 
     Page<Report> getReportsByReportedUserId(Long reportedUserId, Pageable pageable);
 
+    Report updateReportStatus(Long reportId, ReportStatus newStatus);
+
 }
