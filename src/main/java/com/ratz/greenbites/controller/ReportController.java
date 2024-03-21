@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class ReportController {
 
 
     @GetMapping("/type/{type}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
     public ResponseEntity<HttpResponse> getReportsByType(@PathVariable ReferenceType type, Pageable pageable) {
 
         Page<Report> reports = reportService.getReportsByType(type, pageable);
@@ -45,6 +47,7 @@ public class ReportController {
     }
 
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
     public ResponseEntity<HttpResponse> getReportsByStatus(@PathVariable ReportStatus status, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByStatus(status, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
@@ -52,6 +55,7 @@ public class ReportController {
     }
 
     @GetMapping("/reporter/{reporterId}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
     public ResponseEntity<HttpResponse> getReportsByReporterId(@PathVariable Long reporterId, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByReporterId(reporterId, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
@@ -59,13 +63,16 @@ public class ReportController {
     }
 
     @GetMapping("/reportedUser/{reportedUserId}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
     public ResponseEntity<HttpResponse> getReportsByReportedUserId(@PathVariable Long reportedUserId, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByReportedUserId(reportedUserId, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
         return buildPageReportResponse(reportDTOs, "Reports fetched successfully for reportedUserId: " + reportedUserId);
     }
 
+
     @PatchMapping("/{reportId}/status")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpResponse> updateReportStatus(@PathVariable Long reportId, @RequestBody UpdateReportStatusDTO statusDTO) {
         Report updatedReport = reportService.updateReportStatus(reportId, statusDTO.getStatus());
         ReportResponseDTO reportResponseDTO = reportMapper.reportToReportResponseDTO(updatedReport);
