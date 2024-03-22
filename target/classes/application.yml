@@ -1,3 +1,11 @@
+azure:
+  storage:
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
+    account-name: ${AZURE_ACCOUNT_NAME}
+    account-key: ${AZURE_ACCOUNT_KEY}
+    container-name: ${AZURE_CONTAINER_NAME}
+
+
 spring:
   mail:
     host: smtp.gmail.com

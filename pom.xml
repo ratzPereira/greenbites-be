@@ -112,6 +112,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Azure Blob Storage -->
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>12.25.1</version>
+        </dependency>
 
         <dependency>
             <groupId>com.auth0</groupId>

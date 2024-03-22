@@ -6,10 +6,12 @@ import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.exception.ApiException;
 import com.ratz.greenbites.repository.ProfileRepository;
 import com.ratz.greenbites.services.ProfileService;
+import com.ratz.greenbites.services.external.AzureStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final AzureStorageService azureStorageService;
 
     @Override
     public Profile getProfileByUserId(Long id) {
@@ -48,12 +51,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public Profile updateProfilePicture(String photoUrl, Long userId) {
+    public Profile updateProfilePicture(MultipartFile profilePicture, Long userId) {
         log.info("Updating profile picture for user ID: {}", userId);
 
         Profile profile = profileRepository.getProfileByUserId(userId)
                 .orElseThrow(() -> new ApiException("Profile not found for user" + userId));
 
+        String photoUrl = azureStorageService.uploadFile(profilePicture);
         profile.setProfileImageUrl(photoUrl);
 
         return profileRepository.save(profile);
@@ -61,13 +65,16 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public Profile addPhotosToProfile(List<String> photoUrl, Long userId) {
+    public Profile addPhotosToProfile(List<MultipartFile> photoUrls, Long userId) {
         log.info("Adding photos to profile for user ID: {}", userId);
 
         Profile profile = profileRepository.getProfileByUserId(userId)
                 .orElseThrow(() -> new ApiException("Profile not found for user" + userId));
 
-        profile.getPhotos().addAll(photoUrl);
+        List<String> urls = photoUrls.stream()
+                .map(azureStorageService::uploadFile)
+                .toList();
+        profile.getPhotos().addAll(urls);
 
         return profileRepository.save(profile);
     }

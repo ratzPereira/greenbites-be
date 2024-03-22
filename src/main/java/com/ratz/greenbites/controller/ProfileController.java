@@ -1,6 +1,8 @@
 package com.ratz.greenbites.controller;
 
-import com.ratz.greenbites.DTO.profile.*;
+import com.ratz.greenbites.DTO.profile.ProfileDTO;
+import com.ratz.greenbites.DTO.profile.ProfileUpdateDTO;
+import com.ratz.greenbites.DTO.profile.RemovePhotosDTO;
 import com.ratz.greenbites.entity.Profile;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.ProfileResponseMapper;
@@ -12,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -55,21 +60,25 @@ public class ProfileController {
     }
 
     @PutMapping("/photo")
-    public ResponseEntity<ProfileDTO> updateProfilePicture(@RequestBody ProfilePictureDTO dto) {
+    public ResponseEntity<ProfileDTO> updateProfilePicture(@RequestParam("profilePicture") MultipartFile profilePicture) {
+        if (profilePicture.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
 
         User user = getAuthenticatedUser();
-
-        Profile profile = profileService.updateProfilePicture(dto.getProfilePictureUrl(), user.getId());
+        Profile profile = profileService.updateProfilePicture(profilePicture, user.getId());
 
         return buildProfileResponse(user, profile);
     }
 
     @PostMapping("/photos")
-    public ResponseEntity<ProfileDTO> addPhotos(@RequestBody ProfilePhotosDTO dto) {
+    public ResponseEntity<ProfileDTO> addPhotos(@RequestParam("photoUrls") List<MultipartFile> photoUrls) {
+        if (photoUrls.stream().anyMatch(MultipartFile::isEmpty)) {
+            return ResponseEntity.badRequest().build();
+        }
 
         User user = getAuthenticatedUser();
-
-        Profile profile = profileService.addPhotosToProfile(dto.getPhotoUrls(), user.getId());
+        Profile profile = profileService.addPhotosToProfile(photoUrls, user.getId());
 
         return buildProfileResponse(user, profile);
     }

@@ -6,6 +6,7 @@ import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.PostService;
+import com.ratz.greenbites.services.external.AzureStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -25,6 +29,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final AzureStorageService azureStorageService;
 
     @Override
     public Post createPost(CreatePostDTO post, Long userId) {
@@ -36,7 +41,15 @@ public class PostServiceImpl implements PostService {
 
         Post newPost = new Post();
         newPost.setContent(post.getContent());
-        newPost.setImageUrls(post.getImageUrls());
+
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : post.getImageFiles()) {
+            if (!file.isEmpty()) {
+                String imageUrl = azureStorageService.uploadFile(file);
+                imageUrls.add(imageUrl);
+            }
+        }
+        newPost.setImageUrls(imageUrls);
         newPost.setUser(user);
         newPost.setCreatedAt(LocalDateTime.now());
 
@@ -57,7 +70,14 @@ public class PostServiceImpl implements PostService {
         }
 
         existingPost.setContent(post.getContent());
-        existingPost.setImageUrls(post.getImageUrls());
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : post.getImageFiles()) {
+            if (!file.isEmpty()) {
+                String imageUrl = azureStorageService.uploadFile(file);
+                imageUrls.add(imageUrl);
+            }
+        }
+        existingPost.setImageUrls(imageUrls);
 
         return postRepository.save(existingPost);
     }
