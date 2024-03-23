@@ -96,7 +96,7 @@ public class ProfileController {
 
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName(); // ou getEmail(), dependendo de como você configurou UserDetails
+        String currentUsername = authentication.getName();
         return userService.getUserByEmail(currentUsername);
     }
 
