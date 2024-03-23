@@ -15,7 +15,7 @@ public class PrivateMessage {
     @Column(nullable = false)
     private final LocalDateTime sentAt = LocalDateTime.now();
     @Column(nullable = false)
-    private final boolean isRead = false;
+    private boolean isRead = false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
