@@ -46,4 +46,10 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = false)
     private Profile profile;
+
+    @OneToMany(mappedBy = "follower")
+    private Set<UserFollower> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "followed")
+    private Set<UserFollower> following = new HashSet<>();
 }
