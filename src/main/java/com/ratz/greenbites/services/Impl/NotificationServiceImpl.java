@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class NotificationServiceImpl implements NotificationService {
 
 
     @Override
-    public Notification createNotification(Long userId, NotificationType type, String content) {
+    @Async
+    public void createNotification(Long userId, NotificationType type, String content) {
 
         User recipient = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -33,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setType(type);
         notification.setContent(content);
         notification.setRead(false);
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
     }
 
     @Override

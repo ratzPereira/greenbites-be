@@ -4,9 +4,11 @@ import com.ratz.greenbites.DTO.privateMessage.PrivateMessageCreateDTO;
 import com.ratz.greenbites.DTO.privateMessage.PrivateMessageDTO;
 import com.ratz.greenbites.entity.PrivateMessage;
 import com.ratz.greenbites.entity.User;
+import com.ratz.greenbites.enums.NotificationType;
 import com.ratz.greenbites.mapper.PrivateMessageMapper;
 import com.ratz.greenbites.repository.PrivateMessageRepository;
 import com.ratz.greenbites.repository.UserRepository;
+import com.ratz.greenbites.services.NotificationService;
 import com.ratz.greenbites.services.PrivateMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
     private final PrivateMessageRepository privateMessageRepository;
     private final UserRepository userRepository;
     private final PrivateMessageMapper privateMessageMapper;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -35,7 +38,10 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
         message.setContent(messageDTO.getContent());
         message = privateMessageRepository.save(message);
 
+        notificationService.createNotification(message.getRecipient().getId(), NotificationType.MESSAGE, "New message from " + sender.getId());
+
         return PrivateMessageMapper.INSTANCE.privateMessageToPrivateMessageDTO(message);
+
     }
 
     @Override

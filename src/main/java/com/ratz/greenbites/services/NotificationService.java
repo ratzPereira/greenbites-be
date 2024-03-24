@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface NotificationService {
 
-    Notification createNotification(Long userId, NotificationType type, String content);
+    void createNotification(Long userId, NotificationType type, String content);
 
     Page<Notification> getAllUserNotifications(Long userId, Pageable pageable);
 

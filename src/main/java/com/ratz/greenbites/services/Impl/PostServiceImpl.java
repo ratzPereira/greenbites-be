@@ -3,8 +3,10 @@ package com.ratz.greenbites.services.Impl;
 import com.ratz.greenbites.DTO.post.CreatePostDTO;
 import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
+import com.ratz.greenbites.enums.NotificationType;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.UserRepository;
+import com.ratz.greenbites.services.NotificationService;
 import com.ratz.greenbites.services.PostService;
 import com.ratz.greenbites.services.external.AzureStorageService;
 import jakarta.transaction.Transactional;
@@ -30,6 +32,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final AzureStorageService azureStorageService;
+    private final NotificationService notificationService;
 
     @Override
     public Post createPost(CreatePostDTO post, Long userId) {
@@ -129,6 +132,8 @@ public class PostServiceImpl implements PostService {
 
         } else {
             post.getLikedBy().add(user);
+            notificationService.createNotification(post.getUser().getId(), NotificationType.LIKE,
+                    user.getProfile().getFirstName() + " " + user.getProfile().getLastName() + " liked your post");
         }
         postRepository.save(post);
         return true;

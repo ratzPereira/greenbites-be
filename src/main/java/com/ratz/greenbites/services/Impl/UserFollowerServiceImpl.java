@@ -3,8 +3,10 @@ package com.ratz.greenbites.services.Impl;
 import com.ratz.greenbites.DTO.follower.UserSummaryDTO;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.entity.UserFollower;
+import com.ratz.greenbites.enums.NotificationType;
 import com.ratz.greenbites.repository.UserFollowerRepository;
 import com.ratz.greenbites.repository.UserRepository;
+import com.ratz.greenbites.services.NotificationService;
 import com.ratz.greenbites.services.UserFollowerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     private final UserRepository userRepository;
     private final UserFollowerRepository userFollowerRepository;
+    private final NotificationService notificationService;
 
     @Override
     public void followUser(Long currentUserId, Long userIdToFollow) {
@@ -42,6 +45,8 @@ public class UserFollowerServiceImpl implements UserFollowerService {
             log.warn("Attempted to follow non-existing user with id {}.", userIdToFollow);
             throw new UsernameNotFoundException("User to follow not found");
         });
+
+        notificationService.createNotification(userIdToFollow, NotificationType.FOLLOW, "User " + currentUserId + " started following you.");
     }
 
     @Override
