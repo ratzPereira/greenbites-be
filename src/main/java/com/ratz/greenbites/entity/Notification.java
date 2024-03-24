@@ -23,7 +23,9 @@ public class Notification {
     private User recipient;
     @Enumerated(EnumType.STRING)
     private NotificationType type;
-    @Column(nullable = false)
+
+    @Column(name = "is_read")
     private boolean isRead = false;
+
     private String content;
 }
