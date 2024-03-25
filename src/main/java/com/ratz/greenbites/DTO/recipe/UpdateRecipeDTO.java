@@ -1,5 +1,6 @@
 package com.ratz.greenbites.DTO.recipe;
 
+import com.ratz.greenbites.entity.Tag;
 import com.ratz.greenbites.enums.Difficulty;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ public class UpdateRecipeDTO {
     private int cookTime;
     private List<String> instructions;
     private Difficulty difficulty;
-    private Set<String> tags;
+    private Set<Tag> tags;
     private List<MultipartFile> newImageFiles;
     private List<String> imagesToRemove;
     private boolean isPublic;

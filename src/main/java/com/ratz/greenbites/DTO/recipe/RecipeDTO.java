@@ -1,5 +1,6 @@
 package com.ratz.greenbites.DTO.recipe;
 
+import com.ratz.greenbites.entity.Tag;
 import com.ratz.greenbites.enums.Difficulty;
 import lombok.Data;
 
@@ -15,7 +16,7 @@ public class RecipeDTO {
     private int cookTime;
     private List<String> instructions;
     private Difficulty difficulty;
-    private Set<String> tags;
+    private Set<Tag> tags;
     private List<String> images;
     private boolean isPublic;
     private Long userId;

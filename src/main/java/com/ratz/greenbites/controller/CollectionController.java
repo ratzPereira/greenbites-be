@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class CollectionController {
         User user = getAuthenticatedUser();
         Page<CollectionDTO> collections = collectionService.getAllCollectionsForUser(user.getId(), pageable);
         log.info("User {} fetching all collections", user.getId());
-        return buildPageResponse(collections, "Collections fetched successfully.", "collections");
+        return buildHttpResponse(HttpStatus.OK, "Collections fetched successfully.", Map.of("collection", collections));
     }
 
     @GetMapping("/{collectionId}")
@@ -86,21 +85,5 @@ public class CollectionController {
                 .data(data)
                 .build();
         return new ResponseEntity<>(response, status);
-    }
-
-    private ResponseEntity<HttpResponse> buildPageResponse(Page<?> page, String message, String dataType) {
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put(dataType, page.getContent());
-        responseData.put("totalItems", page.getTotalElements());
-        responseData.put("totalPages", page.getTotalPages());
-
-        HttpResponse response = HttpResponse.builder()
-                .timeStamp(LocalDateTime.now().toString())
-                .statusCode(HttpStatus.OK.value())
-                .httpStatus(HttpStatus.OK)
-                .message(message)
-                .data(responseData)
-                .build();
-        return ResponseEntity.ok(response);
     }
 }

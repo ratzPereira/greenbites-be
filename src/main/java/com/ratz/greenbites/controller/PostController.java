@@ -6,7 +6,6 @@ import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.mapper.PostMapper;
 import com.ratz.greenbites.response.HttpResponse;
-import com.ratz.greenbites.services.CollectionService;
 import com.ratz.greenbites.services.PostService;
 import com.ratz.greenbites.services.UserService;
 import jakarta.validation.Valid;
@@ -31,7 +30,6 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
-    private final CollectionService collectionService;
 
     @PostMapping
     public ResponseEntity<PostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
@@ -94,7 +92,7 @@ public class PostController {
     @PostMapping("/{postId}/addToCollection/{collectionId}")
     public ResponseEntity<HttpResponse> addPostToCollection(@PathVariable Long postId, @PathVariable Long collectionId) {
         User user = getAuthenticatedUser();
-        collectionService.addPostToCollection(user.getId(), postId, collectionId);
+        postService.addPostToCollection(user.getId(), postId, collectionId);
         return ResponseEntity.ok().body(HttpResponse.builder()
                 .timeStamp(LocalDateTime.now().toString())
                 .message("Post added to collection successfully")
@@ -106,7 +104,7 @@ public class PostController {
     @DeleteMapping("/{postId}/removeFromCollection/{collectionId}")
     public ResponseEntity<HttpResponse> removePostFromCollection(@PathVariable Long postId, @PathVariable Long collectionId) {
         User user = getAuthenticatedUser();
-        collectionService.removePostFromCollection(user.getId(), postId, collectionId);
+        postService.removePostFromCollection(user.getId(), postId, collectionId);
         return ResponseEntity.ok().body(HttpResponse.builder()
                 .timeStamp(LocalDateTime.now().toString())
                 .message("Post removed from collection successfully")
