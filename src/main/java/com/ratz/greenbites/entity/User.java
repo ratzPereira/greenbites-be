@@ -52,4 +52,10 @@ public class User {
 
     @OneToMany(mappedBy = "followed")
     private Set<UserFollower> following = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_recipe_book",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id"))
+    private Set<Recipe> recipeBook;
 }
