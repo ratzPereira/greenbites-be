@@ -17,4 +17,10 @@ public interface PostService {
     Page<Post> getPostByUserId(Long userId, int pageNumber, int pageSize, String sortBy, String sortDir);
 
     boolean likeOrDislikePost(Long postId, Long userId);
+
+    //removePostFromCollection
+    void removePostFromCollection(Long postId, Long collectionId, Long userId);
+
+    //addPostToCollection
+    void addPostToCollection(Long postId, Long collectionId, Long userId);
 }

@@ -1,9 +1,11 @@
 package com.ratz.greenbites.services.Impl;
 
 import com.ratz.greenbites.DTO.post.CreatePostDTO;
+import com.ratz.greenbites.entity.Collection;
 import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.enums.NotificationType;
+import com.ratz.greenbites.repository.CollectionRepository;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.NotificationService;
@@ -33,6 +35,8 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final AzureStorageService azureStorageService;
     private final NotificationService notificationService;
+    private final CollectionRepository collectionRepository;
+
 
     @Override
     public Post createPost(CreatePostDTO post, Long userId) {
@@ -137,5 +141,39 @@ public class PostServiceImpl implements PostService {
         }
         postRepository.save(post);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void removePostFromCollection(Long postId, Long collectionId, Long userId) {
+        log.info("Removing post with ID: {} from collection with ID: {}", postId, collectionId);
+
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (!collection.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User does not have permission to modify this collection");
+        }
+        collection.getPosts().remove(post);
+        collectionRepository.save(collection);
+    }
+
+    @Override
+    @Transactional
+    public void addPostToCollection(Long postId, Long collectionId, Long userId) {
+        log.info("Adding post with ID: {} to collection with ID: {}", postId, collectionId);
+
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (!collection.getUser().getId().equals(userId)) {
+            throw new RuntimeException("User does not have permission to modify this collection");
+        }
+        collection.getPosts().add(post);
+        collectionRepository.save(collection);
     }
 }
