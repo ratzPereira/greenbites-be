@@ -5,6 +5,12 @@ import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.FeedService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,12 +31,18 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/feed")
 @Slf4j
+@Tag(name = "Feed", description = "The Feed API")
 public class FeedController {
 
     private final FeedService feedService;
     private final UserService userService;
 
     @GetMapping
+    @Operation(summary = "Get user feed", description = "Fetches the personalized feed for the authenticated user, including posts from followed users and recommended content.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Feed fetched successfully", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
     public ResponseEntity<HttpResponse> getFeed(Pageable pageable) {
 
         log.info("GET request to fetch feed for user.");

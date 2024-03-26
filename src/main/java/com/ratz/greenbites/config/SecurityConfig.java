@@ -28,7 +28,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_URLS = {"/api/v1/user/login", "/api/v1/user/register"};
+    private static final String[] PUBLIC_URLS = {"/api/v1/user/login", "/api/v1/user/register", "swagger-ui.html", "swagger-ui/index.html", "/v3/api-docs", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui/**", "/webjars/**"};
 
     private final BCryptPasswordEncoder encoder;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;

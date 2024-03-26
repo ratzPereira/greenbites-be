@@ -6,6 +6,11 @@ import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.PrivateMessageService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +30,7 @@ import static java.time.LocalTime.now;
 @RestController
 @RequestMapping("/api/v1/private-messages")
 @Slf4j
+@Tag(name = "Private Messages", description = "The Private Messages API for sending and receiving private messages.")
 public class PrivateMessageController {
 
     private final PrivateMessageService privateMessageService;
@@ -32,6 +38,10 @@ public class PrivateMessageController {
 
 
     @PostMapping
+    @Operation(summary = "Send Private Message", description = "Sends a private message to another user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Private message sent successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Invalid message data")})
     public ResponseEntity<PrivateMessageDTO> sendPrivateMessage(@Valid @RequestBody PrivateMessageCreateDTO privateMessageCreateDTO) {
 
         log.info("Received request to send private message");
@@ -42,6 +52,10 @@ public class PrivateMessageController {
     }
 
     @GetMapping("/sent")
+    @Operation(summary = "Get Sent Messages", description = "Retrieves the messages sent by the current user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sent messages fetched successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "Messages not found")})
     public ResponseEntity<HttpResponse> getSentMessages(Pageable pageable) {
 
         log.info("Received request to get sent messages");
@@ -51,6 +65,10 @@ public class PrivateMessageController {
     }
 
     @GetMapping("/received")
+    @Operation(summary = "Get Received Messages", description = "Retrieves the messages received by the current user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Received messages fetched successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "Messages not found")})
     public ResponseEntity<HttpResponse> getReceivedMessages(Pageable pageable) {
 
         log.info("Received request to get received messages");
@@ -60,6 +78,10 @@ public class PrivateMessageController {
     }
 
     @GetMapping("/{messageId}")
+    @Operation(summary = "Read Message", description = "Marks a message as read and retrieves its contents.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Message read successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "Message not found")})
     public ResponseEntity<HttpResponse> readMessage(@PathVariable Long messageId) {
 
         log.info("Received request to read message");
@@ -75,6 +97,10 @@ public class PrivateMessageController {
     }
 
     @DeleteMapping("/{messageId}")
+    @Operation(summary = "Delete Message", description = "Deletes a specific message.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Message deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Message not found")})
     public ResponseEntity<HttpResponse> deleteMessage(@PathVariable Long messageId) {
 
         log.info("Received request to delete message");

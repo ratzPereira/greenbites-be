@@ -6,6 +6,12 @@ import com.ratz.greenbites.entity.Comment;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.services.CommentService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +26,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/posts")
 @Slf4j
+@Tag(name = "Comments", description = "Operations related to comments on posts and recipes")
 public class CommentController {
 
     private final CommentService commentService;
     private final UserService userService;
 
     @PostMapping("/{postId}/comments")
+    @Operation(summary = "Create a Comment", description = "Create a comment on a specified post.")
+    @ApiResponse(responseCode = "201", description = "Comment created", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponseDTO.class))})
     public ResponseEntity<CommentResponseDTO> createComment(@PathVariable Long postId, @Valid @RequestBody CreateCommentDTO createCommentDTO) {
 
         log.info("Received request to create comment for post with id: {}", postId);
@@ -35,6 +44,8 @@ public class CommentController {
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
+    @Operation(summary = "Update a Comment", description = "Update a specific comment by comment ID.")
+    @ApiResponse(responseCode = "200", description = "Comment updated", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponseDTO.class))})
     public ResponseEntity<CommentResponseDTO> updateComment(@PathVariable Long commentId, @Valid @RequestBody CreateCommentDTO createCommentDTO) {
 
         log.info("Received request to update comment with id: {}", commentId);
@@ -44,6 +55,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
+    @Operation(summary = "Delete a Comment", description = "Delete a specific comment by comment ID.")
+    @ApiResponse(responseCode = "204", description = "Comment deleted")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
 
         log.info("Received request to delete comment with id: {}", commentId);
@@ -53,6 +66,8 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}/comments/{commentId}/like")
+    @Operation(summary = "Like/Unlike a Comment", description = "Toggle like on a comment. Likes if not liked before, unlikes if already liked.")
+    @ApiResponse(responseCode = "200", description = "Like toggled")
     public ResponseEntity<?> toggleLike(@PathVariable Long commentId) {
 
         log.info("Received request to like comment with id: {}", commentId);
@@ -63,6 +78,8 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}/comments/")
+    @Operation(summary = "Get Comments by Post ID", description = "Retrieve all comments for a given post, with pagination.")
+    @ApiResponse(responseCode = "200", description = "Comments fetched", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CommentResponseDTO.class)))})
     public ResponseEntity<Page<CommentResponseDTO>> getCommentsByPostId(@PathVariable Long postId,
                                                                         @RequestParam(value = "page", defaultValue = "0") int page,
                                                                         @RequestParam(value = "size", defaultValue = "10") int size) {

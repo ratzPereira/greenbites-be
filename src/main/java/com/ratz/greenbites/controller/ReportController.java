@@ -11,6 +11,12 @@ import com.ratz.greenbites.mapper.ReportMapper;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.ReportService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +36,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/reports")
 @Slf4j
+@Tag(name = "Reports", description = "The Reports API for managing user reports.")
 public class ReportController {
 
     private final UserService userService;
@@ -38,7 +45,14 @@ public class ReportController {
 
 
     @GetMapping("/type/{type}")
+    @Operation(summary = "Get reports by type", description = "Fetches paginated reports filtered by the specified type. Requires ROLE_MANAGER, ROLE_ADMIN, or ROLE_SYSADMIN.")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports fetched successfully by type",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Reports not found")})
     public ResponseEntity<HttpResponse> getReportsByType(@PathVariable ReferenceType type, Pageable pageable) {
 
         Page<Report> reports = reportService.getReportsByType(type, pageable);
@@ -47,7 +61,14 @@ public class ReportController {
     }
 
     @GetMapping("/status/{status}")
+    @Operation(summary = "Get reports by status", description = "Fetches paginated reports filtered by the specified status. Requires ROLE_MANAGER, ROLE_ADMIN, or ROLE_SYSADMIN.")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports fetched successfully by status",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Reports not found")})
     public ResponseEntity<HttpResponse> getReportsByStatus(@PathVariable ReportStatus status, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByStatus(status, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
@@ -55,7 +76,14 @@ public class ReportController {
     }
 
     @GetMapping("/reporter/{reporterId}")
+    @Operation(summary = "Get reports by reporter ID", description = "Fetches paginated reports made by the specified reporter. Requires ROLE_MANAGER, ROLE_ADMIN, or ROLE_SYSADMIN.")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports fetched successfully for reporter",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Reports not found")})
     public ResponseEntity<HttpResponse> getReportsByReporterId(@PathVariable Long reporterId, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByReporterId(reporterId, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
@@ -63,7 +91,14 @@ public class ReportController {
     }
 
     @GetMapping("/reportedUser/{reportedUserId}")
+    @Operation(summary = "Get reports by reported user ID", description = "Fetches paginated reports about the specified reported user. Requires ROLE_MANAGER, ROLE_ADMIN, or ROLE_SYSADMIN.")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reports fetched successfully for reported user",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Reports not found")})
     public ResponseEntity<HttpResponse> getReportsByReportedUserId(@PathVariable Long reportedUserId, Pageable pageable) {
         Page<Report> reports = reportService.getReportsByReportedUserId(reportedUserId, pageable);
         Page<ReportResponseDTO> reportDTOs = reports.map(reportMapper::reportToReportResponseDTO);
@@ -72,7 +107,14 @@ public class ReportController {
 
 
     @PatchMapping("/{reportId}/status")
+    @Operation(summary = "Update report status", description = "Updates the status of a report. Requires ROLE_ADMIN.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Report status updated successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Report not found")})
     public ResponseEntity<HttpResponse> updateReportStatus(@PathVariable Long reportId, @RequestBody UpdateReportStatusDTO statusDTO) {
         Report updatedReport = reportService.updateReportStatus(reportId, statusDTO.getStatus());
         ReportResponseDTO reportResponseDTO = reportMapper.reportToReportResponseDTO(updatedReport);
@@ -81,6 +123,12 @@ public class ReportController {
 
 
     @PostMapping
+    @Operation(summary = "Create a new report", description = "Creates a new report with details provided by the user. Accessible by authenticated users.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Report created successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ReportResponseDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad request")})
     public ResponseEntity<HttpResponse> createReport(@RequestBody ReportDTO reportDTO) {
 
         log.info("Attempting to create a new report for reference type: {} and reference id: {}",

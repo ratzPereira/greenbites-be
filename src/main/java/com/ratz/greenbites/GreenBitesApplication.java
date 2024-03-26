@@ -17,5 +17,5 @@ public class GreenBitesApplication {
         int BCRYPT_STRENGTH = 12;
         return new BCryptPasswordEncoder(BCRYPT_STRENGTH);
     }
-	
+
 }

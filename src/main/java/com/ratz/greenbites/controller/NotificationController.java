@@ -7,6 +7,11 @@ import com.ratz.greenbites.mapper.NotificationMapper;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.NotificationService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/notifications")
 @Slf4j
+@Tag(name = "Notifications", description = "The Notifications API for managing user notifications.")
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -32,6 +38,10 @@ public class NotificationController {
 
 
     @GetMapping
+    @Operation(summary = "Get all notifications", description = "Retrieves all notifications for the authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Notifications fetched successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
     public ResponseEntity<HttpResponse> getAllNotifications(Pageable pageable) {
         User userPrincipal = getAuthenticatedUser();
         Page<NotificationDTO> notifications = notificationService.getAllUserNotifications(userPrincipal.getId(), pageable)
@@ -41,6 +51,10 @@ public class NotificationController {
     }
 
     @GetMapping("/unread")
+    @Operation(summary = "Get unread notifications", description = "Retrieves all unread notifications for the authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Unread notifications fetched successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
     public ResponseEntity<HttpResponse> getUnreadNotifications(Pageable pageable) {
         User userPrincipal = getAuthenticatedUser();
         Page<NotificationDTO> notifications = notificationService.getUnreadUserNotifications(userPrincipal.getId(), pageable)
@@ -50,6 +64,10 @@ public class NotificationController {
     }
 
     @PatchMapping("/read/all")
+    @Operation(summary = "Mark all notifications as read", description = "Marks all notifications as read for the authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All notifications marked as read"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
     public ResponseEntity<HttpResponse> markAllNotificationsAsRead() {
         User userPrincipal = getAuthenticatedUser();
         notificationService.markAllNotificationsAsRead(userPrincipal.getId());
@@ -58,6 +76,11 @@ public class NotificationController {
     }
 
     @PatchMapping("/{notificationId}/read")
+    @Operation(summary = "Mark a notification as read", description = "Marks a specific notification as read based on its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Notification marked as read"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Notification not found")})
     public ResponseEntity<HttpResponse> markAsRead(@PathVariable Long notificationId) {
         notificationService.markNotificationAsRead(notificationId);
 

@@ -6,6 +6,9 @@ import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.CollectionService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,12 +26,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/collections")
 @Slf4j
+@Tag(name = "Collections", description = "Operations pertaining to user collections in GreenBites.")
 public class CollectionController {
 
     private final CollectionService collectionService;
     private final UserService userService;
 
     @GetMapping
+    @Operation(summary = "List all collections", description = "Retrieves all collections owned by the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Collections fetched successfully.")
     public ResponseEntity<HttpResponse> getAllCollections(Pageable pageable) {
         User user = getAuthenticatedUser();
         Page<CollectionDTO> collections = collectionService.getAllCollectionsForUser(user.getId(), pageable);
@@ -37,6 +43,8 @@ public class CollectionController {
     }
 
     @GetMapping("/{collectionId}")
+    @Operation(summary = "Get collection by ID", description = "Retrieves a specific collection by its ID.")
+    @ApiResponse(responseCode = "200", description = "Collection fetched successfully.")
     public ResponseEntity<HttpResponse> getCollectionById(@PathVariable Long collectionId) {
         CollectionDTO collectionDTO = collectionService.getCollectionById(collectionId);
         log.info("Fetching collection with ID {}", collectionId);
@@ -44,6 +52,8 @@ public class CollectionController {
     }
 
     @PostMapping
+    @Operation(summary = "Create a new collection", description = "Creates a new collection for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Collection created successfully.")
     public ResponseEntity<HttpResponse> createCollection(@RequestBody CreateCollectionDTO createCollectionDTO) {
         User user = getAuthenticatedUser();
         CollectionDTO collectionDTO = collectionService.createCollection(user.getId(), createCollectionDTO.getName());
@@ -52,6 +62,8 @@ public class CollectionController {
     }
 
     @PutMapping("/{collectionId}")
+    @Operation(summary = "Update a collection", description = "Updates the name of an existing collection.")
+    @ApiResponse(responseCode = "200", description = "Collection updated successfully.")
     public ResponseEntity<HttpResponse> updateCollection(@PathVariable Long collectionId, @RequestBody CreateCollectionDTO collectionDTO) {
         collectionService.updateCollectionName(collectionId, collectionDTO.getName());
         log.info("Updating collection ID {} with new name {}", collectionId, collectionDTO.getName());
@@ -59,6 +71,8 @@ public class CollectionController {
     }
 
     @DeleteMapping("/{collectionId}")
+    @Operation(summary = "Delete a collection", description = "Deletes an existing collection by its ID.")
+    @ApiResponse(responseCode = "200", description = "Collection deleted successfully.")
     public ResponseEntity<HttpResponse> deleteCollection(@PathVariable Long collectionId) {
         collectionService.deleteCollection(collectionId);
         log.info("Deleting collection with ID {}", collectionId);

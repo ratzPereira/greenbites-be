@@ -10,6 +10,12 @@ import com.ratz.greenbites.provider.TokenProvider;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.RoleService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +38,7 @@ import static java.time.LocalDateTime.now;
 @RestController
 @RequestMapping("/api/v1/user")
 @Slf4j
+@Tag(name = "User", description = "The User API for registration and login.")
 public class UserController {
 
     private final UserService userService;
@@ -40,6 +47,12 @@ public class UserController {
     private final TokenProvider tokenProvider;
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new user", description = "Creates a new user with the provided information.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid data provided")})
     public ResponseEntity<HttpResponse> createPlayer(@RequestBody @Valid RegisterFormDTO registerFormDTO) {
 
         log.info("Attempting to register a new player with email: {}", registerFormDTO.getEmail());
@@ -56,6 +69,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates a user with email and password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")})
     public ResponseEntity<HttpResponse> login(@RequestBody @Valid LoginFormDTO loginForm) {
 
         log.info("Attempting to login user with email: {}", loginForm.getEmail());

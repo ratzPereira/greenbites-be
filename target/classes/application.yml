@@ -5,7 +5,6 @@ azure:
     account-key: ${AZURE_ACCOUNT_KEY}
     container-name: ${AZURE_CONTAINER_NAME}
 
-
 spring:
   mail:
     host: smtp.gmail.com

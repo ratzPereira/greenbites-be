@@ -8,6 +8,11 @@ import com.ratz.greenbites.mapper.PostMapper;
 import com.ratz.greenbites.response.HttpResponse;
 import com.ratz.greenbites.services.PostService;
 import com.ratz.greenbites.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +31,17 @@ import static com.ratz.greenbites.utils.AppConstants.*;
 @RestController
 @RequestMapping("/api/v1/posts")
 @Slf4j
+@Tag(name = "Post", description = "The Post API for creating, updating, and deleting posts.")
 public class PostController {
 
     private final PostService postService;
     private final UserService userService;
 
     @PostMapping
+    @Operation(summary = "Create a new post", description = "Allows a user to create a new post.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Post created successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Invalid post data provided")})
     public ResponseEntity<PostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
 
         User user = getAuthenticatedUser();
@@ -40,6 +50,10 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
+    @Operation(summary = "Get a post by ID", description = "Retrieves a post by its unique identifier.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post retrieved successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "Post not found")})
     public ResponseEntity<PostResponseDTO> getPostById(@PathVariable Long postId) {
 
         User user = getAuthenticatedUser();
@@ -48,6 +62,10 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
+    @Operation(summary = "Get posts by user ID", description = "Retrieves all posts created by a specific user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts retrieved successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "User not found")})
     public ResponseEntity<Page<PostResponseDTO>> getPostByUserId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER, value = "pageNumber", required = false) int pageNumber,
@@ -64,6 +82,11 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
+    @Operation(summary = "Update a post", description = "Allows the creator of the post to update it.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post updated successfully", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Invalid post data provided"),
+            @ApiResponse(responseCode = "404", description = "Post not found")})
     public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Long postId, @Valid @RequestBody CreatePostDTO createPostDTO) {
 
         User user = getAuthenticatedUser();
@@ -72,6 +95,10 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
+    @Operation(summary = "Delete a post", description = "Allows the creator of the post to delete it.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Post not found")})
     public ResponseEntity<String> deletePost(@PathVariable Long postId) {
 
         User user = getAuthenticatedUser();
@@ -80,6 +107,10 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like")
+    @Operation(summary = "Like or unlike a post", description = "Allows a user to like or remove like from a post. Toggles the like status.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post like status toggled successfully"),
+            @ApiResponse(responseCode = "404", description = "Post not found")})
     public ResponseEntity<String> likePost(@PathVariable Long postId) {
 
         User user = getAuthenticatedUser();
@@ -90,6 +121,10 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/addToCollection/{collectionId}")
+    @Operation(summary = "Add a post to a collection", description = "Adds the specified post to the specified collection.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post added to collection successfully"),
+            @ApiResponse(responseCode = "404", description = "Post or collection not found")})
     public ResponseEntity<HttpResponse> addPostToCollection(@PathVariable Long postId, @PathVariable Long collectionId) {
         User user = getAuthenticatedUser();
         postService.addPostToCollection(user.getId(), postId, collectionId);
@@ -102,6 +137,10 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/removeFromCollection/{collectionId}")
+    @Operation(summary = "Remove a post from a collection", description = "Removes the specified post from the specified collection.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post removed from collection successfully"),
+            @ApiResponse(responseCode = "404", description = "Post or collection not found")})
     public ResponseEntity<HttpResponse> removePostFromCollection(@PathVariable Long postId, @PathVariable Long collectionId) {
         User user = getAuthenticatedUser();
         postService.removePostFromCollection(user.getId(), postId, collectionId);
