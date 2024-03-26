@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
             // If errors, throw exception with proper message
         } catch (Exception e) {
-            throw new ApiException("Error creating user");
+            throw new ApiException("Error creating user" + e.getMessage());
         }
     }
 
