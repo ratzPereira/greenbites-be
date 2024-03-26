@@ -49,19 +49,14 @@ public class PostServiceImpl implements PostService {
         Post newPost = new Post();
         newPost.setContent(post.getContent());
 
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile file : post.getImageFiles()) {
-            if (!file.isEmpty()) {
-                String imageUrl = azureStorageService.uploadFile(file);
-                imageUrls.add(imageUrl);
-            }
-        }
-        newPost.setImageUrls(imageUrls);
+        uploadImages(post, newPost);
+
         newPost.setUser(user);
         newPost.setCreatedAt(LocalDateTime.now());
 
         return postRepository.save(newPost);
     }
+
 
     @Override
     @Transactional
@@ -77,14 +72,7 @@ public class PostServiceImpl implements PostService {
         }
 
         existingPost.setContent(post.getContent());
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile file : post.getImageFiles()) {
-            if (!file.isEmpty()) {
-                String imageUrl = azureStorageService.uploadFile(file);
-                imageUrls.add(imageUrl);
-            }
-        }
-        existingPost.setImageUrls(imageUrls);
+        uploadImages(post, existingPost);
 
         return postRepository.save(existingPost);
     }
@@ -175,5 +163,21 @@ public class PostServiceImpl implements PostService {
         }
         collection.getPosts().add(post);
         collectionRepository.save(collection);
+    }
+
+
+    private void uploadImages(CreatePostDTO post, Post newPost) {
+        if (post.getImageFiles() == null) {
+            return;
+        }
+
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : post.getImageFiles()) {
+            if (!file.isEmpty()) {
+                String imageUrl = azureStorageService.uploadFile(file);
+                imageUrls.add(imageUrl);
+            }
+        }
+        newPost.setImageUrls(imageUrls);
     }
 }
