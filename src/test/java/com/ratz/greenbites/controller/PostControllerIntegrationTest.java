@@ -3,14 +3,12 @@ package com.ratz.greenbites.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import com.ratz.greenbites.entity.Post;
-import com.ratz.greenbites.entity.Profile;
-import com.ratz.greenbites.entity.Role;
-import com.ratz.greenbites.entity.User;
+import com.ratz.greenbites.entity.*;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.ProfileRepository;
 import com.ratz.greenbites.repository.RoleRepository;
 import com.ratz.greenbites.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +36,7 @@ public class PostControllerIntegrationTest {
 
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
+    Post anotherUsersPost;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -63,6 +61,7 @@ public class PostControllerIntegrationTest {
         user = createUser();
         post = createPost();
 
+        anotherUsersPost = createAnotherUsersPost();
         accessToken = obtainAccessToken(user.getEmail(), "password");
     }
 
@@ -149,7 +148,7 @@ public class PostControllerIntegrationTest {
     }
 
     @Test
-    @Order(6)
+    @Order(14)
     @DisplayName("When delete post then success")
     public void whenDeletePost_thenSuccess() throws Exception {
 
@@ -158,6 +157,102 @@ public class PostControllerIntegrationTest {
                 .andExpect(status().isOk());
 
         assertFalse(postRepository.existsById(post.getId()));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("When create post without authorization then fail")
+    public void whenCreatePostWithoutAuthorization_thenFail() throws Exception {
+        String newPostJson = "{\"content\":\"Unauthorized post content\"}";
+        mockMvc.perform(post("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newPostJson))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("When get posts by nonexistent user id then fail")
+    public void whenGetPostsByNonexistentUserId_thenFail() throws Exception {
+        mockMvc.perform(get("/api/v1/posts/user/" + 99L)
+                        .header("Authorization", accessToken))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("When update another user's post then fail")
+    public void whenUpdateAnotherUsersPost_thenFail() throws Exception {
+
+
+        String updatedPostJson = "{\"content\":\"Unauthorized update content\"}";
+        mockMvc.perform(put("/api/v1/posts/" + anotherUsersPost.getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedPostJson))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("When delete another user's post then fail")
+    public void whenDeleteAnotherUsersPost_thenFail() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/posts/" + anotherUsersPost.getId())
+                        .header("Authorization", accessToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("When create post with no content then fail")
+    public void whenCreatePostWithNoContent_thenFail() throws Exception {
+        String emptyContentPostJson = "{}";
+        mockMvc.perform(post("/api/v1/posts")
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(emptyContentPostJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("When add post to collection then success")
+    public void whenAddPostToCollection_thenSuccess() throws Exception {
+        Long collectionId = 1L;
+        System.out.println("Post ID: " + post.getId());
+        mockMvc.perform(post("/api/v1/posts/" + post.getId() + "/addToCollection/" + collectionId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
+
+
+        MvcResult result = mockMvc.perform(get("/api/v1/collections/" + collectionId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        assertTrue(responseContent.contains(post.getId().toString()));
+
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("When remove post from collection then success")
+    public void whenRemovePostFromCollection_thenSuccess() throws Exception {
+        long collectionId = 1L;
+        System.out.println("Post ID: " + post.getId());
+        mockMvc.perform(delete("/api/v1/posts/" + post.getId() + "/removeFromCollection/" + collectionId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
+
+        MvcResult result = mockMvc.perform(get("/api/v1/collections/" + collectionId)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        assertTrue(responseContent.contains("postIds\":null"));
     }
 
     //create new user
@@ -169,7 +264,7 @@ public class PostControllerIntegrationTest {
         user.setEnabled(true);
         user.setUsingMfa(false);
         user.setRoles(Set.of(roleRepository.findByName("ROLE_USER").get()));
-        userRepository.save(user);
+
 
         Profile profile = new Profile();
         profile.setFirstName("Test");
@@ -177,7 +272,15 @@ public class PostControllerIntegrationTest {
         profile.setUser(user);
         user.setProfile(profile);
 
+
+        Collection collection = new Collection();
+        collection.setName("Test collection");
+        collection.setUser(user);
+        user.setCollections(Set.of(collection));
+
+        userRepository.save(user);
         profileRepository.save(profile);
+
         return user;
     }
 
@@ -224,5 +327,25 @@ public class PostControllerIntegrationTest {
             adminRole.setPermission("ACCESS_ADMIN");
             roleRepository.save(adminRole);
         }
+    }
+
+    //create another user's post
+    private Post createAnotherUsersPost() {
+        User anotherUser = new User();
+        anotherUser.setPassword(passwordEncoder.encode("password"));
+        anotherUser.setEmail("teste2@email.com");
+        anotherUser.setNotLocked(true);
+        anotherUser.setEnabled(true);
+        anotherUser.setUsingMfa(false);
+        anotherUser.setRoles(Set.of(roleRepository.findByName("ROLE_USER").get()));
+        userRepository.save(anotherUser);
+
+        Post anotherUsersPost = new Post();
+        anotherUsersPost.setImageUrls(List.of("url1", "url2"));
+        anotherUsersPost.setContent("content");
+        anotherUsersPost.setUser(anotherUser);
+        postRepository.save(anotherUsersPost);
+
+        return anotherUsersPost;
     }
 }

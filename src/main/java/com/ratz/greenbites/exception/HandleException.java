@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.webjars.NotFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -157,5 +158,29 @@ public class HandleException extends ResponseEntityExceptionHandler implements E
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .build(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<HttpResponse> handleNotFoundException(NotFoundException ex) {
+        log.error("Error message: {}", ex.getMessage());
+        return new ResponseEntity<>(HttpResponse.builder()
+                .timeStamp(now().toString())
+                .reason(ex.getMessage())
+                .developerMessage(ex.getMessage())
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<HttpResponse> handleForbiddenException(ForbiddenException ex) {
+        log.error("Error message: {}", ex.getMessage());
+        return new ResponseEntity<>(HttpResponse.builder()
+                .timeStamp(now().toString())
+                .reason(ex.getMessage())
+                .developerMessage(ex.getMessage())
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .build(), HttpStatus.FORBIDDEN);
     }
 }

@@ -5,11 +5,13 @@ import com.ratz.greenbites.entity.Collection;
 import com.ratz.greenbites.entity.Post;
 import com.ratz.greenbites.entity.User;
 import com.ratz.greenbites.enums.NotificationType;
+import com.ratz.greenbites.exception.ForbiddenException;
 import com.ratz.greenbites.repository.CollectionRepository;
 import com.ratz.greenbites.repository.PostRepository;
 import com.ratz.greenbites.repository.UserRepository;
 import com.ratz.greenbites.services.NotificationService;
 import com.ratz.greenbites.services.PostService;
+import com.ratz.greenbites.services.UserService;
 import com.ratz.greenbites.services.external.AzureStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ public class PostServiceImpl implements PostService {
     private final AzureStorageService azureStorageService;
     private final NotificationService notificationService;
     private final CollectionRepository collectionRepository;
+    private final UserService userService;
 
 
     @Override
@@ -68,7 +72,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
 
         if (!existingPost.getUser().getId().equals(userId)) {
-            throw new RuntimeException("You are not allowed to update this post");
+            throw new ForbiddenException("You are not allowed to update this post");
         }
 
         existingPost.setContent(post.getContent());
@@ -86,7 +90,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
 
         if (!existingPost.getUser().getId().equals(userId)) {
-            throw new RuntimeException("You are not allowed to delete this post");
+            throw new ForbiddenException("You are not allowed to delete this post");
         }
 
         postRepository.deleteById(postId);
@@ -100,6 +104,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<Post> getPostByUserId(Long userId, int pageNumber, int pageSize, String sortBy, String sortDir) {
+
+        //if no user throw exception
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found with id: " + userId);
+        }
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
